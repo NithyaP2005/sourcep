@@ -40,6 +40,20 @@ def pets():
     return render_template('pets.html', pets=pets)
 
 @app.route('/pet/<int:pet_id>')
+def pet_details(pet_id):
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM pets WHERE id=%s"
+            cursor.execute(sql, (pet_id,))
+            pet = cursor.fetchone()
+
+            if not pet:
+                flash('Pet not found', 'error')
+                return redirect(url_for('pets'))
+    finally:
+        connection.close()
+    return render_template('pet_details.html', pet=pet)
 
 @app.route('/adoption-process')
 def adoption_process():
